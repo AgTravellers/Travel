@@ -1,8 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using TravelApp.Storage.SQL;
+using TravelApp.Storage.ImageStore;
+using Microsoft.WindowsAzure.Storage.Blob;
+using System.IO;
+using System.Threading.Tasks;
+using Microsoft.AspNet.Identity;
 
 namespace TravelApp.Controllers
 {
@@ -13,18 +20,36 @@ namespace TravelApp.Controllers
             return View();
         }
 
+        [Authorize]
         public ActionResult About()
         {
-            ViewBag.Message = "Your application description page.";
+            string message = "Not Connected";
+            using (var SqlRepo = new SQLRepository("Data Source=SOGHO-LAPTOP;Initial Catalog=travelappdb;User ID=sa;Password='hujugshuruholo2019$'"))
+            {
+                string query = "select message from testtable";
 
+                SqlCommand oCmd = new SqlCommand(query, SqlRepo.GetConnection());
+                using (SqlDataReader oReader = oCmd.ExecuteReader())
+                {
+                    while (oReader.Read())
+                    {
+                        message = oReader["message"].ToString();
+                    }
+                    //message = "Connected to database";
+                }
+            }
+            ViewBag.Message = message;
             return View();
         }
 
+        [Authorize]
         public ActionResult Contact()
         {
-            ViewBag.Message = "Your contact page.";
 
+            ViewBag.Message = "This is contacts page for " + User.Identity.GetUserName();
             return View();
         }
+
+
     }
 }

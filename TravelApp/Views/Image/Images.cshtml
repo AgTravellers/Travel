@@ -1,0 +1,30 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Images</title>
+</head>
+<body>
+    <span>
+        @if (ViewBag.image != "")
+        {
+            <div>
+                This page will show all your images
+            </div>
+            <img src=@Url.Content(@ViewBag.image) height="600" width="600" />
+        }
+        else
+        {
+            <div>
+                @ViewBag.message
+            </div>
+        }
+
+    </span>
+</body>
+</html>

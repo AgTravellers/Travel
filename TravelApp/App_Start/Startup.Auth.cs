@@ -58,11 +58,11 @@ namespace TravelApp
             //   appId: "",
             //   appSecret: "");
 
-            //app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
-            //{
-            //    ClientId = "",
-            //    ClientSecret = ""
-            //});
+            app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
+            {
+                ClientId = "586031865151-qimjhjkh8r90vlcj3eiq98fpgi9ab43b.apps.googleusercontent.com",
+                ClientSecret = "76jbr6gpij33K74IWPG8AZS5"
+            });
         }
     }
 }

@@ -13,10 +13,11 @@ namespace TravelApp.Storage.SQL
     public class SQLRepository : IDisposable
     {
         private SqlConnection SQLConn;
+        private readonly string DBConnString = "Server=tcp:ta-sqlserver.database.windows.net,1433;Initial Catalog=ta-sqldb;Persist Security Info=False;User ID=ta-sqluser;Password=hujugshuruholo2019$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
 
-        public SQLRepository(string DBConnectionString)
+        public SQLRepository()
         {
-            SQLConn = new SqlConnection(DBConnectionString);
+            SQLConn = new SqlConnection(DBConnString);
             SQLConn.Open();
         }
 

@@ -9,59 +9,43 @@ using Microsoft.AspNet.Identity;
 using System.Web.Mvc;
 using TravelApp.Storage.ImageStore;
 using TravelApp.Storage.SQL;
-//using TravelApp.DataManagers;
+using TravelApp.DataModels;
+using TravelApp.WebAPIs;
 
 namespace TravelApp.Controllers
 {
     public class ImageController : Controller
     {
+        [Authorize]
         public ActionResult Images()
         {
-            //ImageManager iManager = new ImageManager();
-            //string imageName = iManager.GetImageName(User.Identity.) 
-            string ImageContainer = String.Empty;
-            //using (var SqlRepo = new SQLRepository("Data Source=SOGHO-LAPTOP;Initial Catalog=travelappdb;User ID=sa;Password='hujugshuruholo2019$'"))
-            using (var SqlRepo = new SQLRepository("Server=tcp:ta-sqlserver.database.windows.net,1433;Initial Catalog=ta-sqldb;Persist Security Info=False;User ID=ta-sqluser;Password=hujugshuruholo2019$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"))
-            {
-                string query = "select container_name from userimagecontainers";
-                SqlDataReader oReader = SqlRepo.GetRecords(query);
-                oReader.Read();
-                try
-                {
-                    ImageContainer = oReader["container_name"].ToString();
-                }
-                catch
-                {
+            ViewBag.imageUrls = new List<string>();
+            string UserEmailId = User.Identity.GetUserName();
+            UserProfile UserProf = UserManagement.GetUserProfile(UserEmailId);
 
-                }
-            }
-            if (String.IsNullOrEmpty(ImageContainer))
+            if (String.IsNullOrWhiteSpace(UserProf.UserId))
             {
+                // First login, so we need to create an entry 
+                // in userprofile table
+                UserManagement.CreateUserProfile(UserEmailId);
+            }
+
+            if (String.IsNullOrWhiteSpace(UserProf.ImageContainerId))
+            {
+                // No container present, so no images
                 ViewBag.message = "You do not have any pictures yet. Start adding them";
                 ViewBag.image = "";
             }
             else
             {
-                string imageName = string.Empty;
-                using (var ImageRepo = new ImageRepository(ImageContainer))
-                {
-                    var container = ImageRepo.GetCloudBlobContainer();
-                    container.CreateIfNotExistsAsync().Wait();
-                    // Set the permissions so the blobs are public.
-                    BlobContainerPermissions permissions = new BlobContainerPermissions
-                    {
-                        PublicAccess = BlobContainerPublicAccessType.Blob
-                    };
-                    container.SetPermissionsAsync(permissions).Wait();
-                    string imageUri = UploadToBlobStorage(container);
-                    imageName = GetImageFromBlobStorage(imageUri);
-                }
-                ViewBag.image = @"~/Content/Images/" + imageName;
+                // List of image URIs fetched
+                ViewBag.imageUrls = ImageManagement.GetImageUrisFromContainer(UserProf.ImageContainerId);
             }
-
             return View();
         }
-
+ 
+        // No used, kept just for reference
+        // ToDo : Remove
         private static string UploadToBlobStorage(CloudBlobContainer container)
         {
             string localPath = @"C:\\Users\\sogho\\Desktop";
@@ -75,6 +59,8 @@ namespace TravelApp.Controllers
             return cloudBlockBlob.Uri.ToString();
         }
 
+        // No used, kept just for reference
+        // ToDo : Remove
         private static string GetImageFromBlobStorage(String imageUri)
         {
 

@@ -24,7 +24,7 @@ namespace TravelApp.Controllers
         public ActionResult About()
         {
             string message = "Not Connected";
-            using (var SqlRepo = new SQLRepository("Data Source=SOGHO-LAPTOP;Initial Catalog=travelappdb;User ID=sa;Password='hujugshuruholo2019$'"))
+            using (var SqlRepo = new SQLRepository())
             {
                 string query = "select message from testtable";
 

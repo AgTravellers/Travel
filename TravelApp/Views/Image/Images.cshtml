@@ -10,19 +10,20 @@
     <title>Images</title>
 </head>
 <body>
+    <h1>
+        Your Images
+    </h1>
     <span>
-        @if (ViewBag.image != "")
+        @if (ViewBag.imageUrls.Count != 0)
         {
-            <div>
-                This page will show all your images
-            </div>
-            <img src=@Url.Content(@ViewBag.image) height="600" width="600" />
+            foreach (var item in ViewBag.imageUrls)
+            {
+                <img src="@item" height="400" width="400">
+            }
         }
         else
         {
-            <div>
                 @ViewBag.message
-            </div>
         }
 
     </span>

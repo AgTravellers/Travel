@@ -25,7 +25,7 @@ namespace TravelApp.Controllers
 
             if (String.IsNullOrWhiteSpace(UserProf.UserId))
             {
-                // First login, so we need to create an entry 
+                // First login, so we need to create an entry
                 // in userprofile table
                 UserManagement.CreateUserProfile(UserEmailId);
             }
@@ -34,16 +34,69 @@ namespace TravelApp.Controllers
             {
                 // No container present, so no images
                 ViewBag.message = "You do not have any pictures yet. Start adding them";
-                ViewBag.image = "";
             }
             else
             {
                 // List of image URIs fetched
                 ViewBag.imageUrls = ImageManagement.GetImageUrisFromContainer(UserProf.ImageContainerId);
             }
+
             return View();
         }
- 
+
+		//[Authorize]
+		//public ActionResult Upload(string imageUrl)
+		//{
+		//	if (imageUrl == null)
+		//	{
+		//		Console.WriteLine("Failed to get image Url");
+		//	}
+
+		//	ViewBag.message = "Image successfully updated";
+		//	return View("~/Views/Image/Images.cshtml");
+		//}
+
+		[Authorize]
+		[HttpPost]
+		public ActionResult Upload(List<HttpPostedFileBase> postedFiles)
+		{
+			// First save all the files in local disk
+			string path = Server.MapPath("~/LocalStore/Uploads/");
+			if (!Directory.Exists(path))
+			{
+				Directory.CreateDirectory(path);
+			}
+
+			List<string> savedFilePaths = new List<string>();
+			foreach (HttpPostedFileBase postedFile in postedFiles)
+			{
+				if (postedFile != null)
+				{
+					string fileName = Path.GetFileName(postedFile.FileName);
+					postedFile.SaveAs(path + fileName);
+					savedFilePaths.Add(path + fileName);
+				}
+			}
+
+			// Upload to blob storage
+			string userId = User.Identity.GetUserName();
+			string imageContainerId = ImageManagement.GetOrCreateImageContainerIdForUser(userId);
+
+			using (var ImageRepo = new ImageRepository(imageContainerId))
+			{
+				var blobContainer = ImageRepo.GetCloudBlobContainer();
+
+				foreach (string filepath in savedFilePaths)
+				{
+					CloudBlockBlob cloudBlockBlob = blobContainer.GetBlockBlobReference(imageContainerId);
+					cloudBlockBlob.UploadFromFile(filepath);
+					ViewBag.UploadMessage += string.Format("<b>{0}</b> uploaded.<br />", cloudBlockBlob.Uri.ToString());
+				}
+			}
+
+			return View("~/Views/Image/Images.cshtml");
+		}
+
         // No used, kept just for reference
         // ToDo : Remove
         private static string UploadToBlobStorage(CloudBlobContainer container)

@@ -51,5 +51,39 @@ namespace TravelApp.WebAPIs
                 sqlcmd.ExecuteNonQuery();
             }
         }
+
+		public static string CreateImageContainerForUser(string userid)
+		{
+			// get a unique container guid
+			Guid imageContainerGuid = Guid.NewGuid();
+			string containerId = "testcontainertwo";// imageContainerGuid.ToString();
+
+			using (var SqlRepo = new SQLRepository())
+			{
+				SqlCommand sqlcmd = new SqlCommand
+				{
+					Connection = SqlRepo.GetConnection(),
+					CommandText = @"update userprofile set imagecontainerid = @ContainerId where userid = @userid"
+				};
+
+				sqlcmd.Parameters.AddWithValue("@userID", userid);
+				sqlcmd.Parameters.AddWithValue("@ContainerId", containerId);
+				sqlcmd.ExecuteNonQuery();
+			}
+
+			// TODO : How do we detect query execution failures ?
+			return containerId;
+        }
+
+		public static string GetImageContainerIdForUser(string userid)
+		{
+			UserProfile userProfile = UserManagement.GetUserProfile(userid);
+			if (userProfile != null)
+			{
+				return userProfile.ImageContainerId;
+			}
+
+			return null;
+		}
     }
 }

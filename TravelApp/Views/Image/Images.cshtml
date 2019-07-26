@@ -1,9 +1,32 @@
-﻿@{
+﻿@using TravelApp.WebAPIs
+@{
     Layout = null;
 }
 
+@*kept the javascript code only for reference, not used*@
 <!DOCTYPE html>
+<script type="text/javascript">
+        window.onload = function () {
+            var fileupload = document.getElementById("id_file_upload");
+            var filePath = document.getElementById("id_spn_filepath");
+            var pickerbutton = document.getElementById("id_btn_picker");
+            var uploadbutton = document.getElementById("id_btn_upload");
+            pickerbutton.onclick = function () {
+                uploadbutton.style.visibilty = "visible";
+                fileupload.click();
+            };
+            fileupload.onchange = function () {
+               @*@var fileName = fileupload.value.split('\\')[fileupload.value.split('\\').length - 1];
+                filePath.innerHTML = "<b>Selected File: </b>" + fileName;*@
+            };
+        };
 
+        function OnUploadButtonClicked()
+        {
+            var url = '@Url.Action("Upload", "Image", new { imageUrl = "test url" })';
+            window.location.href = url;
+        }
+</script>
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
@@ -13,8 +36,22 @@
     <h1>
         Your Images
     </h1>
+
+    <div>
+        @using (Html.BeginForm("Upload", "Image", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            <span>Select File:</span>
+            <input type="file" name="postedFiles" multiple="multiple" />
+            <input type="submit" value="Upload" />
+            <br />
+            <span style="color:green">@Html.Raw(ViewBag.UploadMessage)</span>
+            <hr />
+        }
+    </div>
+    <br />
+    <br />
     <span>
-        @if (ViewBag.imageUrls.Count != 0)
+        @if (ViewBag.imageUrls != null && ViewBag.imageUrls.Count != 0)
         {
             foreach (var item in ViewBag.imageUrls)
             {
@@ -28,4 +65,5 @@
 
     </span>
 </body>
+
 </html>

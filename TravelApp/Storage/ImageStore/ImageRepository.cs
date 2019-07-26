@@ -18,9 +18,14 @@ namespace TravelApp.Storage.ImageStore
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(BlobStoreConnectionString);
             //Create the service client object for credentialed access to the Blob service.
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
-            // Retrieve a reference to a container.
-            CBlobContainer = blobClient.GetContainerReference(containerName);
-        }
+			// Retrieve a reference to a container.
+			
+			CBlobContainer = blobClient.GetContainerReference(containerName);
+			CBlobContainer.CreateIfNotExists();
+			var permissions = CBlobContainer.GetPermissions();
+			permissions.PublicAccess = BlobContainerPublicAccessType.Blob;
+			CBlobContainer.SetPermissions(permissions);
+		}
 
         public CloudBlobContainer GetCloudBlobContainer()
         {

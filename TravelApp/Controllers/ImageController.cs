@@ -88,8 +88,8 @@ namespace TravelApp.Controllers
 
 				foreach (string filepath in savedFilePaths)
 				{
-					CloudBlockBlob cloudBlockBlob = blobContainer.GetBlockBlobReference(imageContainerId);
-					cloudBlockBlob.UploadFromFile(filepath);
+                    CloudBlockBlob cloudBlockBlob = blobContainer.GetBlockBlobReference(Path.GetFileName(filepath));
+                    cloudBlockBlob.UploadFromFile(filepath);
 					ViewBag.UploadMessage += string.Format("<b>{0}</b> uploaded.<br />", cloudBlockBlob.Uri.ToString());
 				}
 			}

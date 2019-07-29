@@ -213,9 +213,11 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AlbumsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ImageController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="DataModels\AlbumInfo.cs" />
     <Compile Include="DataModels\UserProfile.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -228,6 +230,7 @@
     <Compile Include="Storage\ImageStore\ImageRepository.cs" />
     <Compile Include="Storage\SQL\SQLRepository.cs" />
     <Compile Include="Utils\Utility.cs" />
+    <Compile Include="WebAPIs\AlbumManagement.cs" />
     <Compile Include="WebAPIs\ImageManagement.cs" />
     <Compile Include="WebAPIs\UserManagement.cs" />
   </ItemGroup>
@@ -292,6 +295,7 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Image\Images.cshtml" />
+    <Content Include="Views\Albums\Albums.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

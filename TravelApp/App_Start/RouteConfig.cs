@@ -14,6 +14,12 @@ namespace TravelApp
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
+                name: "Images",
+                url: "{controller}/{action}/{id}",
+                defaults: new { controller = "Image", action = "Images", id = UrlParameter.Optional, albumname = UrlParameter.Optional, containername = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }

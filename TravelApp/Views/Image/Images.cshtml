@@ -1,6 +1,6 @@
 ﻿@using TravelApp.WebAPIs
 @{
-    Layout = null;
+    Layout = "";
 }
 
 @*kept the javascript code only for reference, not used*@
@@ -30,15 +30,15 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Images</title>
+    <title>@ViewBag.albumName</title>
 </head>
 <body>
     <h1>
-        Your Images
+        @ViewBag.albumName
     </h1>
 
     <div>
-        @using (Html.BeginForm("Upload", "Image", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        @using (Html.BeginForm("Upload", "Image", new { containerName = ViewBag.containerName}, FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             <span>Select File:</span>
             <input type="file" name="postedFiles" multiple="multiple" />

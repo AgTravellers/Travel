@@ -11,6 +11,7 @@ using TravelApp.Storage.ImageStore;
 using TravelApp.Storage.SQL;
 using TravelApp.DataModels;
 using TravelApp.WebAPIs;
+using TravelApp.Utils;
 
 namespace TravelApp.Controllers
 {
@@ -68,14 +69,27 @@ namespace TravelApp.Controllers
 			}
 
 			List<string> savedFilePaths = new List<string>();
+			string failedFileNames = String.Empty;
 			foreach (HttpPostedFileBase postedFile in postedFiles)
 			{
 				if (postedFile != null)
 				{
 					string fileName = Path.GetFileName(postedFile.FileName);
-					postedFile.SaveAs(path + fileName);
-					savedFilePaths.Add(path + fileName);
+					if (Utility.FileSizeInMegabytes(postedFile) <= 4)
+					{
+						postedFile.SaveAs(path + fileName);
+						savedFilePaths.Add(path + fileName);
+					}
+					else
+					{
+						failedFileNames += String.IsNullOrWhiteSpace(failedFileNames) ? fileName : string.Format(", {0}", fileName);
+					}
 				}
+			}
+
+			if (String.IsNullOrWhiteSpace(failedFileNames))
+			{
+				ViewBag.UploadFailureMessage = string.Format("Failed to upload {0}. Currently images with size greater than 4MB is not supported", failedFileNames);
 			}
 
 			// Upload to blob storage

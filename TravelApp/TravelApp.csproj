@@ -227,6 +227,7 @@
     <Compile Include="Startup.cs" />
     <Compile Include="Storage\ImageStore\ImageRepository.cs" />
     <Compile Include="Storage\SQL\SQLRepository.cs" />
+    <Compile Include="Utils\Utility.cs" />
     <Compile Include="WebAPIs\ImageManagement.cs" />
     <Compile Include="WebAPIs\UserManagement.cs" />
   </ItemGroup>

@@ -104,32 +104,77 @@ namespace TravelApp.Controllers
 			return View("~/Views/Image/Images.cshtml");
 		}
 
-        // Not used, kept just for reference
-        // ToDo : Remove
-        //private static string UploadToBlobStorage(CloudBlobContainer container)
-        //{
-        //    string localPath = @"C:\\Users\\sogho\\Desktop";
-        //    string localFileName = "TestImage1.jpg";
-        //    var sourceFile = Path.Combine(localPath, localFileName);
+		[Authorize]
+		[HttpPost]
+		public ActionResult Upload1()
+		{
+			if (Request.Files.Count > 0)
+			{
+				try
+				{
+					string containerName = Request.Params["containername"];
+					int lastImageIndex = int.Parse(Request.Params["lastimageindex"]);
+					 
+					//  Get all files from Request object  
+					HttpFileCollectionBase files = Request.Files;
+					List<string> savedFilePaths = new List<string>();
+					for (int i = 0; i < files.Count; i++)
+					{
+						//string path = AppDomain.CurrentDomain.BaseDirectory + "Uploads/";  
+						//string filename = Path.GetFileName(Request.Files[i].FileName);  
 
-        //    // Get a reference to the blob address, then upload the file to the blob.
-        //    // Use the value of localFileName for the blob name.
-        //    CloudBlockBlob cloudBlockBlob = container.GetBlockBlobReference(localFileName);
-        //    cloudBlockBlob.UploadFromFile(sourceFile);
-        //    return cloudBlockBlob.Uri.ToString();
-        //}
+						HttpPostedFileBase file = files[i];
+						string fname;
 
-        // Not used, kept just for reference
-        // ToDo : Remove
-        //private static string GetImageFromBlobStorage(String imageUri)
-        //{
+						// Checking for Internet Explorer  
+						if (Request.Browser.Browser.ToUpper() == "IE" || Request.Browser.Browser.ToUpper() == "INTERNETEXPLORER")
+						{
+							string[] testfiles = file.FileName.Split(new char[] { '\\' });
+							fname = string.Format("{0}_{1}", lastImageIndex, testfiles[testfiles.Length - 1]);
+						}
+						else
+						{
+							fname = string.Format("{0}_{1}", lastImageIndex, file.FileName);
+						}
 
-        //    CloudBlockBlob cloudBlockBlob = new CloudBlockBlob(new System.Uri(imageUri));
-        //    string localPath = @"C:\Users\sogho\Documents\GitHub\Travel\TravelApp\Content\Images";
-        //    string localFileName = "TestImage1_downloaded.jpg";
-        //    var destinationFile = Path.Combine(localPath, localFileName);
-        //    cloudBlockBlob.DownloadToFile(destinationFile, FileMode.Create);
-        //    return localFileName;
-        //}
-    }
+						// Get the complete folder path and store the file inside it.
+						fname = Path.Combine(Server.MapPath("~/LocalStore/Uploads/"), fname);
+						file.SaveAs(fname);
+						savedFilePaths.Add(fname);
+						lastImageIndex++;
+                    }
+
+					// Upload to blob storage
+					string userId = User.Identity.GetUserName();
+					
+					using (var ImageRepo = new ImageRepository(containerName))
+					{
+						var blobContainer = ImageRepo.GetCloudBlobContainer();
+
+						foreach (string filepath in savedFilePaths)
+						{
+							CloudBlockBlob cloudBlockBlob = blobContainer.GetBlockBlobReference(Path.GetFileName(filepath));
+							cloudBlockBlob.UploadFromFile(filepath);
+							ViewBag.UploadMessage += string.Format("<b>{0}</b> uploaded.<br />", cloudBlockBlob.Uri.ToString());
+						}
+					}
+
+					// Update the lastimageIndex of the container
+					AlbumManagement.UpdateLastImageIndex(containerName, lastImageIndex);
+
+					// Returns message that successfully uploaded  
+					return Json("File Uploaded Successfully!");
+				}
+				catch (Exception ex)
+				{
+					return Json("Error occurred. Error details: " + ex.Message);
+				}
+			}
+			else
+			{
+				return Json("No files selected.");
+			}
+		}
+			
+	}
 }

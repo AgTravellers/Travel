@@ -5,27 +5,62 @@
 
 @*kept the javascript code only for reference, not used*@
 <!DOCTYPE html>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script type="text/javascript">
-        window.onload = function () {
-            var fileupload = document.getElementById("id_file_upload");
-            var filePath = document.getElementById("id_spn_filepath");
-            var pickerbutton = document.getElementById("id_btn_picker");
-            var uploadbutton = document.getElementById("id_btn_upload");
-            pickerbutton.onclick = function () {
-                uploadbutton.style.visibilty = "visible";
-                fileupload.click();
-            };
-            fileupload.onchange = function () {
-               @*@var fileName = fileupload.value.split('\\')[fileupload.value.split('\\').length - 1];
-                filePath.innerHTML = "<b>Selected File: </b>" + fileName;*@
-            };
-        };
+var getParams = function (url) {
+	var params = {};
+	var parser = document.createElement('a');
+	parser.href = url;
+	var query = parser.search.substring(1);
+	var vars = query.split('&');
+	for (var i = 0; i < vars.length; i++) {
+		var pair = vars[i].split('=');
+		params[pair[0]] = decodeURIComponent(pair[1]);
+	}
+	return params;
+};
 
-        function OnUploadButtonClicked()
-        {
-            var url = '@Url.Action("Upload", "Image", new { imageUrl = "test url" })';
-            window.location.href = url;
+$(document).ready(function(){
+    $('#btnUpload').click(function () {
+
+        // Checking whether FormData is available in browser
+        if (window.FormData !== undefined) {
+
+            var fileUpload = $("#FileUpload1").get(0);
+            var files = fileUpload.files;
+
+            // Create FormData object
+            var fileData = new FormData();
+
+            // Looping over all files and add it to FormData object
+            for (var i = 0; i < files.length; i++) {
+                fileData.append(files[i].name, files[i]);
+            }
+
+            // Adding one more key to FormData object
+            var params = getParams(window.location.href);
+            fileData.append('containername', params['containername']);
+            fileData.append('lastimageindex', params['lastimageindex']);
+            fileData.append('albumname', params['albumname']);
+
+            $.ajax({
+                url: '/Image/Upload1',
+                type: "POST",
+                contentType: false, // Not to set any content header
+                processData: false, // Not to process data
+                data: fileData,
+                success: function (result) {
+                   // alert(result);
+                },
+                error: function (err) {
+                    //alert(err.statusText);
+                }
+            });
+        } else {
+            alert("FormData is not supported.");
         }
+    });
+});
 </script>
 <html>
 <head>
@@ -37,8 +72,8 @@
         @ViewBag.albumName
     </h1>
 
-    <div>
-        @using (Html.BeginForm("Upload", "Image", new { containerName = ViewBag.containerName}, FormMethod.Post, new { enctype = "multipart/form-data" }))
+    @*<div>
+        @using (Html.BeginForm("Upload", "Image", new { containerName = "testc"}, FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             <span>Select File:</span>
             <input type="file" name="postedFiles" multiple="multiple" />
@@ -48,6 +83,12 @@
             <span style="color:green">@Html.Raw(ViewBag.UploadFailureMessage)</span>
             <hr />
         }
+    </div>*@
+    <div>
+        <br />
+        <input type="file" id="FileUpload1" multiple="multiple" />
+        <input type="button" id="btnUpload" value="Upload Files" /> 
+        <hr />
     </div>
     <br />
     <br />

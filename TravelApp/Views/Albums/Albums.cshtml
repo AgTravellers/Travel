@@ -32,7 +32,8 @@
             var data = { name: albumName };
 
             $.post(url, data, function (result) {
-                var albums = [{ AlbumName: albumName, ContainerName: '' }];
+                var albums = [];
+                albums.push(result);
                 displayAlbums(albums);
             });
         }
@@ -46,12 +47,12 @@
         }
         for (var i = 0; i < array.length; i++) {
             var linkElement = document.createElement('a');
-            linkElement.href = '@Url.Action("Images/","Image")' + '?containername=' + array[i].ContainerName + '&albumname='+ array[i].AlbumName;
+            linkElement.href = '@Url.Action("Images/","Image")' + '?containername=' + array[i].ContainerName + '&albumname='+ array[i].AlbumName + '&lastimageindex=' + array[i].LastImageIndex;
             var img = document.createElement('img');
             img.src = "..\\Images\\albumcover.JPG";
             img.height = "150";
             img.width = "150";
-            
+
             linkElement.appendChild(img);
             document.getElementById('albums').appendChild(linkElement);
             var albumname = document.createElement("P");

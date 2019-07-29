@@ -40,10 +40,11 @@ namespace TravelApp.Controllers
         }
 
         [System.Web.Mvc.HttpPost]
-        public void CreateAlbum([FromBody] string name)
+        public ActionResult CreateAlbum([FromBody] string name)
         {
             string UserEmailId = User.Identity.GetUserName();
-            AlbumManagement.CreateAlbum(UserEmailId, name);
+            AlbumInfo albumInfo = AlbumManagement.CreateAlbum(UserEmailId, name);
+			return Json(albumInfo, JsonRequestBehavior.AllowGet);
         }
     }
 }

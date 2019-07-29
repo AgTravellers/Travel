@@ -11,10 +11,13 @@ namespace TravelApp.DataModels
 
         public string ContainerName { get; set; }
 
-        public AlbumInfo(string albumname, string containername)
+		public int LastImageIndex { get; set; }
+
+        public AlbumInfo(string albumname, string containername, string lastImageIndex)
         {
             this.AlbumName = albumname;
             this.ContainerName = containername;
+			this.LastImageIndex = int.Parse(lastImageIndex);
         }
     }
 }

@@ -6,7 +6,9 @@
 @*kept the javascript code only for reference, not used*@
 <!DOCTYPE html>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="../../scripts/jquery-1.10.2.js"></script>
 <script type="text/javascript">
+
 var getParams = function (url) {
 	var params = {};
 	var parser = document.createElement('a');
@@ -19,6 +21,29 @@ var getParams = function (url) {
 	}
 	return params;
 };
+
+function OnDeleteItemClicked(filepath) {
+    var params = getParams(window.location.href);
+    var containername = params['containername'];
+
+    //var url = "/Image/Delete1" + "?containername=" + containername + "&filepath=" + filepath;
+    //$.get(url, null, function (result) {
+    //        alert(result);
+    //    });
+
+    $.ajax({
+                type: "GET",
+                url: '/Image/Delete' + '?containername=' + containername + '&filepath=' + filepath,
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                   alert(result);
+                   document.location.reload();
+                },
+                error: function (err) {
+                   alert(err.statusText);
+                }
+            });
+}
 
 $(document).ready(function(){
     $('#btnUpload').click(function () {
@@ -56,6 +81,7 @@ $(document).ready(function(){
                 },
                 error: function (err) {
                    alert(err.statusText);
+                   document.location.reload();
                 }
             });
         } else {
@@ -68,6 +94,57 @@ $(document).ready(function(){
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.albumName</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: 0px;
+            margin-top: 0px;
+            margin-right: 6px;
+            margin-bottom: 2px;
+        }
+
+        .image {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .overlay {
+            position: absolute;
+            align: right;
+            top: 0;
+            bottom: 0;
+            left: 90%;
+            right: 0;
+            height: 10%;
+            width: 10%;
+            opacity: 0;
+            transition: .3s ease;
+            background-color: gray;
+        }
+
+        .container:hover .overlay {
+            opacity: 1;
+        }
+
+        .icon {
+            color: white;
+            font-size: 20px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .fa-user:hover {
+            color: red;
+        }
+    </style>
 </head>
 <body>
     <h1>
@@ -81,13 +158,20 @@ $(document).ready(function(){
     </div>
     <br />
     <br />
-    <span style="display:block">
+    <span style="display:flex; flex-wrap:wrap">
         @if (ViewBag.imageUrls != null && ViewBag.imageUrls.Count != 0)
         {
             foreach (var item in ViewBag.imageUrls)
             {
-                <img src="@item" height="400" width="400">
-            }
+                <div class="container">
+                    <img src="@item" height="400" width="400">
+                    <div class="overlay" onclick="OnDeleteItemClicked('@item')">
+                        <a href="#" class="icon" title="User Profile">
+                            <i class="fa fa-user"></i>
+                        </a>
+                    </div>
+                </div>
+}
         }
         else
         {

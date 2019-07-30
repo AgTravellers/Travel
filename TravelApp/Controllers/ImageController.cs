@@ -115,6 +115,26 @@ namespace TravelApp.Controllers
 				return Json("No files selected.");
 			}
 		}
-			
+
+		[Authorize]
+		[HttpGet]
+		public ActionResult Delete(string containerName, string filepath)
+		{
+			if (String.IsNullOrWhiteSpace(containerName) || String.IsNullOrWhiteSpace(filepath))
+			{
+				return Json("Failed to delete file", JsonRequestBehavior.AllowGet);
+			}
+
+			using (var ImageRepo = new ImageRepository(containerName))
+			{
+				string fileName = Path.GetFileName(filepath);
+				var blobContainer = ImageRepo.GetCloudBlobContainer();
+				CloudBlockBlob cloudBlockBlob = blobContainer.GetBlockBlobReference(fileName);
+				cloudBlockBlob.DeleteIfExists();
+			}
+
+			return Json("Successfully deleted file", JsonRequestBehavior.AllowGet);
+		}
+
 	}
 }

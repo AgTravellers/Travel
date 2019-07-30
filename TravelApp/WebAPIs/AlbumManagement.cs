@@ -64,7 +64,7 @@ namespace TravelApp.WebAPIs
 				SqlCommand sqlcmd = new SqlCommand
 				{
 					Connection = SqlRepo.GetConnection(),
-					CommandText = "UPDATE imagecontainers set lastimageindex = '@lastImageIndex' where containerid = '@containerId'"
+					CommandText = "UPDATE imagecontainers set lastimageindex = @lastImageIndex where containerid = @containerId"
 				};
 				sqlcmd.Parameters.AddWithValue("@lastImageIndex", lastImageIndex);
 				sqlcmd.Parameters.AddWithValue("@containerId", containerId);

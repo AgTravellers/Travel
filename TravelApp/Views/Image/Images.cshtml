@@ -20,6 +20,30 @@ var getParams = function (url) {
 	return params;
 };
 
+function GetImagesImageEndpoint(containername, albumname) {
+
+    var params = JSON.stringify({
+                'id' : '1',
+                 'albumname': albumname,
+                 'conatinername':containername,
+               });
+
+            $.ajax({
+                url: '/Image/Images'+ '?id=1' + '&containername=' + containername + '&albumname='+ albumname,
+                type: "GET",
+                contentType: "application/json; charset=utf-8", // Not to set any content header
+                dataType: "json",
+                //processData: false, // Not to process data
+                data: params,
+                success: function (result) {
+                   alert("Refresh Successful");
+                },
+                error: function (err) {
+                   //alert(err.statusText);
+                }
+            });
+    }
+
 $(document).ready(function(){
     $('#btnUpload').click(function () {
 
@@ -50,10 +74,12 @@ $(document).ready(function(){
                 processData: false, // Not to process data
                 data: fileData,
                 success: function (result) {
-                   // alert(result);
+                   alert(result);
+                   //GetImagesImageEndpoint(params['containername'], params['albumname']);
+                    document.location.reload();
                 },
                 error: function (err) {
-                    //alert(err.statusText);
+                   alert(err.statusText);
                 }
             });
         } else {
@@ -92,7 +118,7 @@ $(document).ready(function(){
     </div>
     <br />
     <br />
-    <span>
+    <span style="display:block">
         @if (ViewBag.imageUrls != null && ViewBag.imageUrls.Count != 0)
         {
             foreach (var item in ViewBag.imageUrls)

@@ -20,30 +20,6 @@ var getParams = function (url) {
 	return params;
 };
 
-function GetImagesImageEndpoint(containername, albumname) {
-
-    var params = JSON.stringify({
-                'id' : '1',
-                 'albumname': albumname,
-                 'conatinername':containername,
-               });
-
-            $.ajax({
-                url: '/Image/Images'+ '?id=1' + '&containername=' + containername + '&albumname='+ albumname,
-                type: "GET",
-                contentType: "application/json; charset=utf-8", // Not to set any content header
-                dataType: "json",
-                //processData: false, // Not to process data
-                data: params,
-                success: function (result) {
-                   alert("Refresh Successful");
-                },
-                error: function (err) {
-                   //alert(err.statusText);
-                }
-            });
-    }
-
 $(document).ready(function(){
     $('#btnUpload').click(function () {
 
@@ -68,7 +44,7 @@ $(document).ready(function(){
             fileData.append('albumname', params['albumname']);
 
             $.ajax({
-                url: '/Image/Upload1',
+                url: '/Image/Upload',
                 type: "POST",
                 contentType: false, // Not to set any content header
                 processData: false, // Not to process data
@@ -97,19 +73,6 @@ $(document).ready(function(){
     <h1>
         @ViewBag.albumName
     </h1>
-
-    @*<div>
-        @using (Html.BeginForm("Upload", "Image", new { containerName = "testc"}, FormMethod.Post, new { enctype = "multipart/form-data" }))
-        {
-            <span>Select File:</span>
-            <input type="file" name="postedFiles" multiple="multiple" />
-            <input type="submit" value="Upload" />
-            <br />
-            <span style="color:green">@Html.Raw(ViewBag.UploadMessage)</span>
-            <span style="color:green">@Html.Raw(ViewBag.UploadFailureMessage)</span>
-            <hr />
-        }
-    </div>*@
     <div>
         <br />
         <input type="file" id="FileUpload1" multiple="multiple" />
@@ -130,7 +93,6 @@ $(document).ready(function(){
         {
                 @ViewBag.message
         }
-
     </span>
 </body>
 

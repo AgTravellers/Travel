@@ -1,112 +1,42 @@
 ﻿using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.IO;
-using System.Linq;
 using System.Web;
 using Microsoft.AspNet.Identity;
 using System.Web.Mvc;
 using TravelApp.Storage.ImageStore;
-using TravelApp.Storage.SQL;
-using TravelApp.DataModels;
 using TravelApp.WebAPIs;
-using TravelApp.Utils;
 
 namespace TravelApp.Controllers
 {
-    public class ImageController : Controller
-    {
-        [Authorize]
-        public ActionResult Images(string id, string albumname, string containername)
-        {
-            ViewBag.imageUrls = new List<string>();
-
-            if (String.IsNullOrWhiteSpace(albumname))
-            {
-                return Redirect("/Albums/Albums");
-            }
-            // Set the name of the album
-            ViewBag.albumName = albumname;
-            ViewBag.containerName = containername;
-            ViewBag.message = "You do not have any images in this album. Start adding.";
-
-            if (!String.IsNullOrWhiteSpace(containername))
-            {
-                // List of image URIs fetched
-                ViewBag.imageUrls = ImageManagement.GetImageUrisFromContainer(containername);
-            }
-            return View();
-        }
-
-		//[Authorize]
-		//public ActionResult Upload(string imageUrl)
-		//{
-		//	if (imageUrl == null)
-		//	{
-		//		Console.WriteLine("Failed to get image Url");
-		//	}
-
-		//	ViewBag.message = "Image successfully updated";
-		//	return View("~/Views/Image/Images.cshtml");
-		//}
-
+	public class ImageController : Controller
+	{
 		[Authorize]
-		[HttpPost]
-		public ActionResult Upload(List<HttpPostedFileBase> postedFiles, string containerName)
+		public ActionResult Images(string id, string albumname, string containername)
 		{
-			// First save all the files in local disk
-			string path = Server.MapPath("~/LocalStore/Uploads/");
-			if (!Directory.Exists(path))
+			ViewBag.imageUrls = new List<string>();
+
+			if (String.IsNullOrWhiteSpace(albumname))
 			{
-				Directory.CreateDirectory(path);
+				return Redirect("/Albums/Albums");
 			}
+			// Set the name of the album
+			ViewBag.albumName = albumname;
+			ViewBag.containerName = containername;
+			ViewBag.message = "You do not have any images in this album. Start adding.";
 
-			List<string> savedFilePaths = new List<string>();
-			string failedFileNames = String.Empty;
-			foreach (HttpPostedFileBase postedFile in postedFiles)
+			if (!String.IsNullOrWhiteSpace(containername))
 			{
-				if (postedFile != null)
-				{
-					string fileName = Path.GetFileName(postedFile.FileName);
-					if (Utility.FileSizeInMegabytes(postedFile) <= 4)
-					{
-						postedFile.SaveAs(path + fileName);
-						savedFilePaths.Add(path + fileName);
-					}
-					else
-					{
-						failedFileNames += String.IsNullOrWhiteSpace(failedFileNames) ? fileName : string.Format(", {0}", fileName);
-					}
-				}
+				// List of image URIs fetched
+				ViewBag.imageUrls = ImageManagement.GetImageUrisFromContainer(containername);
 			}
-
-			if (String.IsNullOrWhiteSpace(failedFileNames))
-			{
-				ViewBag.UploadFailureMessage = string.Format("Failed to upload {0}. Currently images with size greater than 4MB is not supported", failedFileNames);
-			}
-
-			// Upload to blob storage
-			string userId = User.Identity.GetUserName();
-
-            using (var ImageRepo = new ImageRepository(containerName))
-            {
-                var blobContainer = ImageRepo.GetCloudBlobContainer();
-
-                foreach (string filepath in savedFilePaths)
-                {
-                    CloudBlockBlob cloudBlockBlob = blobContainer.GetBlockBlobReference(Path.GetFileName(filepath));
-                    cloudBlockBlob.UploadFromFile(filepath);
-                    ViewBag.UploadMessage += string.Format("<b>{0}</b> uploaded.<br />", cloudBlockBlob.Uri.ToString());
-                }
-            }
-
-			return View("~/Views/Image/Images.cshtml");
+			return View();
 		}
 
 		[Authorize]
 		[HttpPost]
-		public ActionResult Upload1()
+		public ActionResult Upload()
 		{
 			if (Request.Files.Count > 0)
 			{
@@ -142,7 +72,7 @@ namespace TravelApp.Controllers
 						file.SaveAs(fname);
 						savedFilePaths.Add(fname);
 						lastImageIndex++;
-                    }
+					}
 
 					// Upload to blob storage
 					string userId = User.Identity.GetUserName();
@@ -156,6 +86,16 @@ namespace TravelApp.Controllers
 							CloudBlockBlob cloudBlockBlob = blobContainer.GetBlockBlobReference(Path.GetFileName(filepath));
 							cloudBlockBlob.UploadFromFile(filepath);
 							ViewBag.UploadMessage += string.Format("<b>{0}</b> uploaded.<br />", cloudBlockBlob.Uri.ToString());
+						}
+					}
+
+					// Now the images are uploaded to blob, delete them from local store.
+					// TODO : Revisit the delete logic when if we need implement disk cache. (really do we need to ?)
+					foreach (string filepath in savedFilePaths)
+					{
+						if (System.IO.File.Exists(filepath))
+						{
+							System.IO.File.Delete(filepath);
 						}
 					}
 

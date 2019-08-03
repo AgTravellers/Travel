@@ -3,11 +3,29 @@
 @{
     ViewBag.Title = "Albums";
 }
+<!DOCTYPE html>
+<link rel="stylesheet" href="~/Content/common.css" type="text/css" />
+<link rel="stylesheet" href="~/Content/Albums.css" type="text/css" />
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+</head>
+<body>
+    <div class="row">
+        <div class="column left">
+            <span class="headerTextPrimary">
+                @ViewBag.Title
+            </span>
+        </div>
+        <div class="column right">
+            <span id="create-album">
+                <button onclick="createAlbum()" style="float: right">New Album</button>
+            </span>
+        </div>
+    </div>
 
-<h2>Albums</h2>
-
-<div id="create-album">
-    <button onclick="createAlbum()">Create Album</button>
-</div>
-<div id="albums"></div>
-
+    <hr />
+    <div id="albums"></div>
+</body>
+</html>

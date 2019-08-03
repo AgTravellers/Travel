@@ -33,6 +33,8 @@ namespace TravelApp.WebAPIs
 
         public static AlbumInfo CreateAlbum(String UserEmailId, string AlbumName)
         {
+            // TODO : These generation of random container name needs fix.
+            // A new API needs to be created and put in utility file
             Random rnd = new Random();
             int number = rnd.Next(1, 100);
             string containername = "testcontainer" + number.ToString();
@@ -49,6 +51,8 @@ namespace TravelApp.WebAPIs
                 sqlcmd.Parameters.AddWithValue("@containerName", albumInfo.ContainerName);
                 sqlcmd.Parameters.AddWithValue("@albumName", albumInfo.AlbumName);
 				sqlcmd.Parameters.AddWithValue("@lastImageIndex", albumInfo.LastImageIndex);
+                // TODO: Consider if we should catch primary key violation exception. Can 
+                // two randomly generated containers names not be the same?
 				sqlcmd.ExecuteNonQuery();
             }
 

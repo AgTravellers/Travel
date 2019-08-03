@@ -1,0 +1,41 @@
+﻿.column {
+    float: left;
+    padding: 10px;
+}
+
+.left {
+    width: 50%;
+}
+
+.right {
+    width: 50%;
+}
+
+.album-row {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+
+.album-cell {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.album-name {
+    text-align: center;
+}
+
+.album-column {
+    float: left;
+    width: 25%;
+    padding: 10px;
+}
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+

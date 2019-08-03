@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using TravelApp.Storage.SQL;
+using TravelApp.Storage.ImageStore;
 using TravelApp.DataModels;
 
 namespace TravelApp.WebAPIs
@@ -57,6 +58,31 @@ namespace TravelApp.WebAPIs
             }
 
 			return albumInfo;
+        }
+
+        public static bool DeleteAlbum(string containerName)
+        {
+            // Delete entry from database
+            using (var SqlRepo = new SQLRepository())
+            {
+                SqlCommand sqlcmd = new SqlCommand
+                {
+                    Connection = SqlRepo.GetConnection(),
+                    CommandText = "DELETE FROM imagecontainers WHERE containerid = @containerName"
+                };
+                sqlcmd.Parameters.AddWithValue("@containerName", containerName);
+                if (sqlcmd.ExecuteNonQuery() != 1)
+                {
+                    return false;
+                }
+            }
+            // Delete from Blob store
+            using (var ImageRepo = new ImageRepository(containerName))
+            {
+                var blobContainer = ImageRepo.GetCloudBlobContainer();
+                blobContainer.DeleteIfExists();
+            }
+            return true;
         }
 
 		public static void UpdateLastImageIndex(string containerId, int lastImageIndex)

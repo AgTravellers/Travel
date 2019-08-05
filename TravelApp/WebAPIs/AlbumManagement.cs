@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using TravelApp.Storage.SQL;
+using TravelApp.Storage.ImageStore;
 using TravelApp.DataModels;
 
 namespace TravelApp.WebAPIs
@@ -33,6 +34,8 @@ namespace TravelApp.WebAPIs
 
         public static AlbumInfo CreateAlbum(String UserEmailId, string AlbumName)
         {
+            // TODO : These generation of random container name needs fix.
+            // A new API needs to be created and put in utility file
             Random rnd = new Random();
             int number = rnd.Next(1, 100);
             string containername = "testcontainer" + number.ToString();
@@ -49,10 +52,37 @@ namespace TravelApp.WebAPIs
                 sqlcmd.Parameters.AddWithValue("@containerName", albumInfo.ContainerName);
                 sqlcmd.Parameters.AddWithValue("@albumName", albumInfo.AlbumName);
 				sqlcmd.Parameters.AddWithValue("@lastImageIndex", albumInfo.LastImageIndex);
+                // TODO: Consider if we should catch primary key violation exception. Can 
+                // two randomly generated containers names not be the same?
 				sqlcmd.ExecuteNonQuery();
             }
 
 			return albumInfo;
+        }
+
+        public static bool DeleteAlbum(string containerName)
+        {
+            // Delete entry from database
+            using (var SqlRepo = new SQLRepository())
+            {
+                SqlCommand sqlcmd = new SqlCommand
+                {
+                    Connection = SqlRepo.GetConnection(),
+                    CommandText = "DELETE FROM imagecontainers WHERE containerid = @containerName"
+                };
+                sqlcmd.Parameters.AddWithValue("@containerName", containerName);
+                if (sqlcmd.ExecuteNonQuery() != 1)
+                {
+                    return false;
+                }
+            }
+            // Delete from Blob store
+            using (var ImageRepo = new ImageRepository(containerName))
+            {
+                var blobContainer = ImageRepo.GetCloudBlobContainer();
+                blobContainer.DeleteIfExists();
+            }
+            return true;
         }
 
 		public static void UpdateLastImageIndex(string containerId, int lastImageIndex)

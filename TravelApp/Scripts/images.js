@@ -77,4 +77,25 @@ $(document).ready(function(){
             alert("FormData is not supported.");
         }
     });
+    $('#btnDeleteAlbum').click(function () {
+        // Pop up to confirm
+        var result = confirm("Are you sure to delete this album?");
+        if (result) {
+            var params = getParams(window.location.href);
+            var containername = params['containername'];
+
+            $.ajax({
+                type: "GET",
+                url: '/Albums/Delete' + '?containername=' + containername,
+                contentType: "application/json; charset=utf-8",
+                success: function (result) {
+                    //alert(result);
+                    window.location.replace("/Albums/Albums");
+                },
+                error: function (err) {
+                    alert(err.statusText);
+                }
+            });
+        }
+    });
 });

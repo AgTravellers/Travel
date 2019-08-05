@@ -45,5 +45,16 @@ namespace TravelApp.Controllers
 
 			return Json(albumInfo, JsonRequestBehavior.AllowGet);
 		}
-	}
+
+		[System.Web.Mvc.Authorize]
+		[System.Web.Mvc.HttpGet]
+		public ActionResult Delete(string containerName)
+		{
+			if (!String.IsNullOrWhiteSpace(containerName) && AlbumManagement.DeleteAlbum(containerName))
+			{
+				return Json("Successfully deleted album", JsonRequestBehavior.AllowGet);
+			}
+			return Json("Failed to delete album", JsonRequestBehavior.AllowGet);
+		}
+		}
 }

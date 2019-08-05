@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="TravelDb.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012.Azure" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <!--Errors Found During Generation:
+warning 6013: The table/view 'ta-sqldb.dbo.albums' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
+        <EntityType Name="albums">
+          <Property Name="containername" Type="nvarchar" MaxLength="256" />
+          <Property Name="albumname" Type="nvarchar" MaxLength="256" />
+          <Property Name="username" Type="nvarchar" MaxLength="256" />
+        </EntityType>-->
+        <EntityType Name="imagecontainers">
+          <Key>
+            <PropertyRef Name="containerid" />
+          </Key>
+          <Property Name="containerid" Type="nvarchar" MaxLength="256" Nullable="false" />
+          <Property Name="userid" Type="nvarchar" MaxLength="256" />
+          <Property Name="albumname" Type="nvarchar" MaxLength="256" />
+          <Property Name="albumid" Type="nvarchar" MaxLength="256" />
+          <Property Name="lastimageindex" Type="int" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6013: The table/view 'ta-sqldb.dbo.userimagecontainers' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
+        <EntityType Name="userimagecontainers">
+          <Property Name="user_name" Type="nvarchar" MaxLength="256" />
+          <Property Name="container_name" Type="nvarchar" MaxLength="256" />
+        </EntityType>-->
+        <EntityType Name="userprofile">
+          <Key>
+            <PropertyRef Name="userid" />
+          </Key>
+          <Property Name="userid" Type="varchar" MaxLength="256" Nullable="false" />
+          <Property Name="imagecontainerid" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityContainer Name="TravelDbStoreContainer">
+          <EntitySet Name="imagecontainers" EntityType="Self.imagecontainers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="userprofile" EntityType="Self.userprofile" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="TravelDb" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="imagecontainer">
+          <Key>
+            <PropertyRef Name="containerid" />
+          </Key>
+          <Property Name="containerid" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="userid" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="albumname" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="albumid" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="lastimageindex" Type="Int32" />
+        </EntityType>
+        <EntityType Name="userprofile">
+          <Key>
+            <PropertyRef Name="userid" />
+          </Key>
+          <Property Name="userid" Type="String" MaxLength="256" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="imagecontainerid" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="imagecontainers" EntityType="Self.imagecontainer" />
+          <EntitySet Name="userprofiles" EntityType="Self.userprofile" />
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="TravelDbStoreContainer" CdmEntityContainer="Entities">
+          <EntitySetMapping Name="imagecontainers">
+            <EntityTypeMapping TypeName="TravelDb.imagecontainer">
+              <MappingFragment StoreEntitySet="imagecontainers">
+                <ScalarProperty Name="containerid" ColumnName="containerid" />
+                <ScalarProperty Name="userid" ColumnName="userid" />
+                <ScalarProperty Name="albumname" ColumnName="albumname" />
+                <ScalarProperty Name="albumid" ColumnName="albumid" />
+                <ScalarProperty Name="lastimageindex" ColumnName="lastimageindex" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="userprofiles">
+            <EntityTypeMapping TypeName="TravelDb.userprofile">
+              <MappingFragment StoreEntitySet="userprofile">
+                <ScalarProperty Name="userid" ColumnName="userid" />
+                <ScalarProperty Name="imagecontainerid" ColumnName="imagecontainerid" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

@@ -42,7 +42,8 @@ namespace TravelApp.Controllers
 		{
 			string UserEmailId = User.Identity.GetUserName();
 			AlbumInfo albumInfo = AlbumManagement.CreateAlbum(UserEmailId, name);
+
 			return Json(albumInfo, JsonRequestBehavior.AllowGet);
 		}
 	}
-	}
+}

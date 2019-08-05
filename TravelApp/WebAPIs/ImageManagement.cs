@@ -1,5 +1,4 @@
 ﻿using Microsoft.WindowsAzure.Storage.Blob;
-using System;
 using System.Collections.Generic;
 using TravelApp.Storage.ImageStore;
 
@@ -25,22 +24,6 @@ namespace TravelApp.WebAPIs
 			}
 
 			return images;
-		}
-
-		public static string GetOrCreateImageContainerIdForUser(string userId)
-		{
-			string imageContainerId = UserManagement.GetImageContainerIdForUser(userId);
-			if (String.IsNullOrWhiteSpace(imageContainerId))
-			{
-				imageContainerId = UserManagement.CreateImageContainerForUser(userId);
-			}
-
-			return imageContainerId;
-		}
-
-		public static void UploadImage(string test)
-		{
-
 		}
 	}
 }

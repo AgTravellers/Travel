@@ -1,74 +1,89 @@
 ﻿using System;
-using System.Data.SqlClient;
+using System.Linq;
 using TravelApp.DataModels;
-using TravelApp.Storage.SQL;
 
 namespace TravelApp.WebAPIs
 {
 	public class UserManagement
 	{
-		public static UserProfile GetUserProfile(string UserEmailId)
+		public static UserProfile GetUserProfile(string userEmailId)
 		{
-			string userID = String.Empty;
-			string imageContainerId = String.Empty;
-			using (var SqlRepo = new SQLRepository())
+			userprofile userProfile = null;
+			using (var context = new Entities())
 			{
-				SqlCommand sqlcmd = new SqlCommand
-				{
-					Connection = SqlRepo.GetConnection(),
-					CommandText = "SELECT userid, imagecontainerid FROM userprofile WHERE userid = @userID"
-				};
-				sqlcmd.Parameters.AddWithValue("@userID", UserEmailId);
-
-				SqlDataReader record = sqlcmd.ExecuteReader();
-				if (record.HasRows)
-				{ 
-					// There should be only one record
-					record.Read();
-					userID = record["userid"].ToString();
-					if (!record.IsDBNull(record.GetOrdinal("imagecontainerid")))
-					{
-						imageContainerId = record["imagecontainerid"].ToString();
-					}
-				}
+				userProfile = context.userprofiles.Where(s => s.userid == userEmailId).FirstOrDefault<userprofile>();
 			}
-			return new UserProfile(userID, imageContainerId);
+
+			return new UserProfile(userProfile.userid, userProfile.imagecontainerid);
 		}
 
-		public static void CreateUserProfile(string UserEmailId)
+		//public static void CreateUserProfile(string UserEmailId)
+		//{
+		//	using (var SqlRepo = new SQLRepository())
+		//	{
+		//		SqlCommand sqlcmd = new SqlCommand
+		//		{
+		//			Connection = SqlRepo.GetConnection(),
+		//			CommandText = @"INSERT INTO userprofile VALUES (@userID, null)"
+		//		};
+		//		sqlcmd.Parameters.AddWithValue("@userID", UserEmailId);
+		//		sqlcmd.ExecuteNonQuery();
+		//	}
+		//}
+
+		public static void CreateUserProfile(string userEmailId)
 		{
-			using (var SqlRepo = new SQLRepository())
+			using (var context = new Entities())
 			{
-				SqlCommand sqlcmd = new SqlCommand
+				var std = new userprofile()
 				{
-					Connection = SqlRepo.GetConnection(),
-					CommandText = @"INSERT INTO userprofile VALUES (@userID, null)"
+					userid = userEmailId,
+					imagecontainerid = null
 				};
-				sqlcmd.Parameters.AddWithValue("@userID", UserEmailId);
-				sqlcmd.ExecuteNonQuery();
+
+				context.userprofiles.Add(std);
+				context.SaveChanges();
 			}
 		}
+
+		//public static string CreateImageContainerForUser(string userid)
+		//{
+		//	// get a unique container guid
+		//	Guid imageContainerGuid = Guid.NewGuid();
+		//	string containerId = "testcontainertwo";// imageContainerGuid.ToString();
+
+		//	using (var SqlRepo = new SQLRepository())
+		//	{
+		//		SqlCommand sqlcmd = new SqlCommand
+		//		{
+		//			Connection = SqlRepo.GetConnection(),
+		//			CommandText = @"update userprofile set imagecontainerid = @ContainerId where userid = @userid"
+		//		};
+
+		//		sqlcmd.Parameters.AddWithValue("@userID", userid);
+		//		sqlcmd.Parameters.AddWithValue("@ContainerId", containerId);
+		//		sqlcmd.ExecuteNonQuery();
+		//	}
+
+		//	// TODO : How do we detect query execution failures ?
+		//	return containerId;
+		//}
 
 		public static string CreateImageContainerForUser(string userid)
 		{
-			// get a unique container guid
+			// Get a unique container guid
 			Guid imageContainerGuid = Guid.NewGuid();
+			// TODO : Replace the logic for unique container id
 			string containerId = "testcontainertwo";// imageContainerGuid.ToString();
 
-			using (var SqlRepo = new SQLRepository())
+			userprofile userProfile = null;
+			using (var context = new Entities())
 			{
-				SqlCommand sqlcmd = new SqlCommand
-				{
-					Connection = SqlRepo.GetConnection(),
-					CommandText = @"update userprofile set imagecontainerid = @ContainerId where userid = @userid"
-				};
-
-				sqlcmd.Parameters.AddWithValue("@userID", userid);
-				sqlcmd.Parameters.AddWithValue("@ContainerId", containerId);
-				sqlcmd.ExecuteNonQuery();
+				userProfile = context.userprofiles.Where(s => s.userid == userid).FirstOrDefault<userprofile>();
+				userProfile.imagecontainerid = containerId;
+				context.SaveChanges();
 			}
 
-			// TODO : How do we detect query execution failures ?
 			return containerId;
 		}
 

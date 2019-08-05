@@ -23,6 +23,7 @@ namespace TravelApp.WebAPIs
 					}
 				} while (blobResultSegment.ContinuationToken != null);
 			}
+
 			return images;
 		}
 

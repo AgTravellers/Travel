@@ -35,13 +35,13 @@ namespace TravelApp.WebAPIs
 		{
 			using (var context = new Entities())
 			{
-				var std = new userprofile()
+				var userProfile = new userprofile()
 				{
 					userid = userEmailId,
 					imagecontainerid = null
 				};
 
-				context.userprofiles.Add(std);
+				context.userprofiles.Add(userProfile);
 				context.SaveChanges();
 			}
 		}
